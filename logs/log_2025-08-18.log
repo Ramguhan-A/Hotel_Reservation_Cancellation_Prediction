@@ -1,0 +1,72 @@
+2025-08-18 04:39:08,520 - INFO - yaml File reading successfull
+2025-08-18 04:39:08,520 - INFO - Data ingestion started with hotel_reservation_data and file Hotel_Reservations_data.csv
+2025-08-18 04:39:08,520 - INFO - Starting data ingestion process
+2025-08-18 04:39:22,022 - INFO - CSV file successfully downloaded to artifacts/raw\raw.csv
+2025-08-18 04:39:22,022 - INFO - Spliting the file....
+2025-08-18 04:39:22,556 - INFO - Train data saved to artifacts/raw\train.csv
+2025-08-18 04:39:22,556 - INFO - Test data saved to artifacts/raw\test.csv
+2025-08-18 04:39:22,566 - INFO - Data ingestion completed successfully
+2025-08-18 04:39:22,566 - INFO - Data ingestion completed
+2025-08-18 04:39:22,566 - INFO - yaml File reading successfull
+2025-08-18 04:39:22,586 - INFO - loading the data from RAW directry...
+2025-08-18 04:39:22,586 - INFO - Loading data
+2025-08-18 04:39:22,678 - INFO - Loading data
+2025-08-18 04:39:22,710 - INFO - Starting our Data Processing step
+2025-08-18 04:39:22,710 - INFO - Dropping columns...
+2025-08-18 04:39:22,742 - INFO - Dropping duplicates...
+2025-08-18 04:39:22,774 - INFO - Applying Lable Encoding on Categorical columns...
+2025-08-18 04:39:22,808 - INFO - Label Mappings are: 
+2025-08-18 04:39:22,808 - INFO - type_of_meal_plan: {'Meal Plan 1': np.int64(0), 'Meal Plan 2': np.int64(1), 'Meal Plan 3': np.int64(2), 'Not Selected': np.int64(3)}
+2025-08-18 04:39:22,808 - INFO - room_type_reserved: {'Room_Type 1': np.int64(0), 'Room_Type 2': np.int64(1), 'Room_Type 3': np.int64(2), 'Room_Type 4': np.int64(3), 'Room_Type 5': np.int64(4), 'Room_Type 6': np.int64(5), 'Room_Type 7': np.int64(6)}
+2025-08-18 04:39:22,808 - INFO - market_segment_type: {'Aviation': np.int64(0), 'Complementary': np.int64(1), 'Corporate': np.int64(2), 'Offline': np.int64(3), 'Online': np.int64(4)}
+2025-08-18 04:39:22,808 - INFO - booking_status: {'Canceled': np.int64(0), 'Not_Canceled': np.int64(1)}
+2025-08-18 04:39:22,808 - INFO - required_car_parking_space: {np.int64(0): np.int64(0), np.int64(1): np.int64(1)}
+2025-08-18 04:39:22,808 - INFO - repeated_guest: {np.int64(0): np.int64(0), np.int64(1): np.int64(1)}
+2025-08-18 04:39:22,808 - INFO - Skewness handling...
+2025-08-18 04:39:22,816 - INFO - Starting our Data Processing step
+2025-08-18 04:39:22,816 - INFO - Dropping columns...
+2025-08-18 04:39:22,818 - INFO - Dropping duplicates...
+2025-08-18 04:39:22,826 - INFO - Applying Lable Encoding on Categorical columns...
+2025-08-18 04:39:22,838 - INFO - Label Mappings are: 
+2025-08-18 04:39:22,838 - INFO - type_of_meal_plan: {'Meal Plan 1': np.int64(0), 'Meal Plan 2': np.int64(1), 'Meal Plan 3': np.int64(2), 'Not Selected': np.int64(3)}
+2025-08-18 04:39:22,838 - INFO - room_type_reserved: {'Room_Type 1': np.int64(0), 'Room_Type 2': np.int64(1), 'Room_Type 3': np.int64(2), 'Room_Type 4': np.int64(3), 'Room_Type 5': np.int64(4), 'Room_Type 6': np.int64(5), 'Room_Type 7': np.int64(6)}
+2025-08-18 04:39:22,838 - INFO - market_segment_type: {'Aviation': np.int64(0), 'Complementary': np.int64(1), 'Corporate': np.int64(2), 'Offline': np.int64(3), 'Online': np.int64(4)}
+2025-08-18 04:39:22,838 - INFO - booking_status: {'Canceled': np.int64(0), 'Not_Canceled': np.int64(1)}
+2025-08-18 04:39:22,838 - INFO - required_car_parking_space: {np.int64(0): np.int64(0), np.int64(1): np.int64(1)}
+2025-08-18 04:39:22,838 - INFO - repeated_guest: {np.int64(0): np.int64(0), np.int64(1): np.int64(1)}
+2025-08-18 04:39:22,838 - INFO - Skewness handling...
+2025-08-18 04:39:22,842 - INFO - Handling Imbalanced data...
+2025-08-18 04:39:28,693 - INFO - Data balanced succesfully
+2025-08-18 04:39:28,695 - INFO - Selecting Features ...
+2025-08-18 04:39:34,275 - INFO - Feature selection of top 10 are ['lead_time' 'no_of_special_requests' 'avg_price_per_room' 'arrival_month'
+ 'arrival_date' 'market_segment_type' 'no_of_week_nights'
+ 'no_of_weekend_nights' 'room_type_reserved' 'type_of_meal_plan']... selected successfully
+2025-08-18 04:39:34,288 - INFO - Saving the preprocessed dataframe as CSV
+2025-08-18 04:39:34,446 - INFO - Data saved successfully on artifacts/processes\processed_train.csv
+2025-08-18 04:39:34,446 - INFO - Saving the preprocessed dataframe as CSV
+2025-08-18 04:39:34,478 - INFO - Data saved successfully on artifacts/processes\processed_test.csv
+2025-08-18 04:39:34,478 - INFO - Data processing completed successfully
+2025-08-18 04:39:35,707 - INFO - Starting our Model trianing pipeline
+2025-08-18 04:39:35,707 - INFO - Starting MLFLOW experiment tracking
+2025-08-18 04:39:35,707 - INFO - Logging the training and testing dataset to MLFLOW
+2025-08-18 04:39:35,715 - INFO - Loading data from artifacts/processes\processed_train.csv
+2025-08-18 04:39:35,715 - INFO - Loading data
+2025-08-18 04:39:35,752 - INFO - Loading data from artifacts/processes\processed_test.csv
+2025-08-18 04:39:35,752 - INFO - Loading data
+2025-08-18 04:39:35,760 - INFO - Splitting train data...
+2025-08-18 04:39:35,760 - INFO - Splitting test data...
+2025-08-18 04:39:35,760 - INFO - Data splitted successfully for Model Training
+2025-08-18 04:39:35,760 - INFO - Initializing our model
+2025-08-18 04:39:35,760 - INFO - Tuning the model using Hyper paramters...
+2025-08-18 04:39:35,760 - INFO - Fitting the model (hyper paramter tuning)...
+2025-08-18 04:39:59,551 - INFO - Hyperparameter tuning completed
+2025-08-18 04:39:59,551 - INFO - Best paramters are : {'boosting_type': 'goss', 'learning_rate': np.float64(0.08965429868602329), 'max_depth': 7, 'min_child_samples': 27, 'n_estimators': 288, 'num_leaves': 30}
+2025-08-18 04:39:59,633 - INFO - Accuracy score 0.8488506697535968
+2025-08-18 04:39:59,633 - INFO - Precision score 0.9006574141709277
+2025-08-18 04:39:59,633 - INFO - Recall score 0.879667063020214
+2025-08-18 04:39:59,633 - INFO - F1 score 0.8900384985563041
+2025-08-18 04:39:59,633 - INFO - Saving the model
+2025-08-18 04:39:59,657 - INFO - Model saved in artifacts/models/lgbm_model_2.pkl
+2025-08-18 04:39:59,657 - INFO - Logging the model into ML flow
+2025-08-18 04:39:59,657 - INFO - Saving the model parameters and metrics to MLflow
+2025-08-18 04:39:59,713 - INFO - Model training completed...
