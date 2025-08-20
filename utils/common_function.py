@@ -4,7 +4,7 @@ from src.custom_exception import CustomException
 import pandas
 import yaml
 import pandas as pd
-
+import joblib
 
 logger = get_logger(__name__)
 
@@ -33,3 +33,18 @@ def load_data(path):
     except Exception as e:
         logger.error(f"Error while loading the data {e}")
         raise CustomException("Failed to laod the data",e)
+    
+#################################################################################################
+
+def save_object(obj, file_path):
+    try:
+        
+        dir_name = os.path.dirname(file_path)
+        os.makedirs(dir_name, exist_ok=True)
+        
+        # with open(file_path, 'wb') as file_obj:
+        joblib.dump(obj, file_path)
+        
+    except Exception as e:
+        logger.error(f"Failed to save the {obj} in the {file_path}, {e}")
+        raise CustomException("Failed to save the file")

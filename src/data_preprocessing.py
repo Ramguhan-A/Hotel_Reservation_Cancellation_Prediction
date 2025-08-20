@@ -4,7 +4,7 @@ import numpy as np
 from src.logger import get_logger
 from src.custom_exception import CustomException
 from config.paths_config import *
-from utils.common_function import read_yaml, load_data
+from utils.common_function import read_yaml, load_data, save_object
 from sklearn.ensemble import RandomForestClassifier # for feature selection
 from sklearn.preprocessing import LabelEncoder
 from imblearn.over_sampling import SMOTE
@@ -18,6 +18,9 @@ class DataProcessor:
         self.train_path = train_path
         self.test_path = test_path
         self.processed_dir = processed_dir
+        
+        self.label_encoders = {}
+        self.selected_feature = []
         
         self.config = read_yaml(config_path)
         
@@ -42,15 +45,16 @@ class DataProcessor:
             num_columns = self.config["data_processing"]["numerical_columns"]
             
             logger.info("Applying Lable Encoding on Categorical columns...")
-            
-            label_encoder = LabelEncoder()
 
             label_mappings = {}
-
+            
+            self.label_encoders = {} # Saving the fitted label encoder
             for col in cat_columns:
                 
-                df[col] = label_encoder.fit_transform(df[col])
-                label_mappings[col] = {label: code for label, code in zip(label_encoder.classes_, label_encoder.transform(label_encoder.classes_))}
+                le = LabelEncoder()
+                df[col] = le.fit_transform(df[col])
+                self.label_encoders[col] = le  # Saving the fitted label encoder
+                label_mappings[col] = {label: code for label, code in zip(le.classes_, le.transform(le.classes_))}
             
             logger.info("Label Mappings are: ")
             
@@ -70,11 +74,15 @@ class DataProcessor:
                     continue
                 df[column] = np.log1p(df[column])
                 
+            
+            self.skewed_columns = skewness[skewness > skew_threshold].index.tolist()  # Saving the skewed columns to reapply in test data
+            
             return df
         
         except Exception as e:
             logger.error(f"Error occured in data preprocessing pipeline {e}")
             raise CustomException("Error while preprocess data", e)
+    
     
     def balance_data(self, df):
         try:
@@ -124,11 +132,13 @@ class DataProcessor:
 
             top_features = important_feature["feature"].head(no_of_features).values
             
-            top_10_df = df[top_features.tolist() + ["booking_status"]]
+            self.selected_feature = top_features.tolist() # Save the selected features
+            
+            top_selected_feature = df[top_features.tolist() + ["booking_status"]]
             
             logger.info(f"Feature selection of top {no_of_features} are {top_features}... selected successfully")
             
-            return top_10_df
+            return top_selected_feature
         
         except Exception as e:
             logger.error(f"Error occured while selecting features {e}")
@@ -148,6 +158,54 @@ class DataProcessor:
             logger.error("Error occured while saving the dataframe as CSV")
             raise CustomException("Error occured while saving the data", e)
         
+    
+    def transform_data(self, df):
+        
+        """For test data we need to apply the saved encoder on training data and the selected features from train data"""
+        try:
+            logger.info("Starting our Data Processing step")
+            
+            # 1. Drop columns and duplicates
+            logger.info("Dropping columns on test data...")
+            
+            df.drop(columns=["Unnamed: 0","Booking_ID"], inplace=True)
+            
+            logger.info("Dropping duplicates on test data...")
+            
+            df.drop_duplicates(inplace=True)
+            
+            # Apply saved label encoders
+            
+            logger.info("Applying saved Lable Encoder on Categorical columns (Test data)...")
+            
+            for col, le in self.label_encoders.items():
+                if col in df.columns:
+                    df[col] = le.transform(df[col])
+                    
+
+            cat_columns = self.config["data_processing"]["categorical_columns"]
+            num_columns = self.config["data_processing"]["numerical_columns"]
+            
+            
+            # Skewness fix in numerical features (log-transform)
+            logger.info("Applying log transform on skewed columns from training...")
+            
+            for column in self.skewed_columns:
+                if column in df.columns:
+                    if (df[column] <= -1).any():  # to prevent negative values on the feature (if any)
+                        logger.warning(f"Skipping log transform for {column} due to negative values in test data")
+                        continue
+                    df[column] = np.log1p(df[column])
+                
+            # Keeping only the selected columns on train data
+            df = df[self.selected_feature + ["booking_status"]] if "booking_status" in df.columns else df[self.selected_feature]
+            
+            return df
+        
+        except Exception as e:
+            logger.error(f"Error while transforming new data {e}")
+            raise CustomException("Error while transforming new data", e)
+        
     def pre_process(self):
         try:
             logger.info("loading the data from RAW directry...")
@@ -158,20 +216,28 @@ class DataProcessor:
             
             # Preprocess the data
             train_df = self.preprocess_data(train_df)
-            test_df = self.preprocess_data(test_df)
             
             # Balance the data (only on train data)
             train_df = self.balance_data(train_df)
-
             
             # Feature selection
-            train_df = self.feature_selection(train_df)
-            test_df = test_df[train_df.columns]  # Ensure same columns from train_df
+            train_df = self.feature_selection(train_df)  # For train data we applied on transform data function
             
-            # Save the data
+            # Transform test data with saved encoders
+            test_df = self.transform_data(test_df)      # Applying transform_data (saved label encoder on training data)
+            
+            # Save processed data
             self.save_data(train_df, PROCESSED_TRAIN_DATA_PATH)
             self.save_data(test_df, PROCESSED_TEST_DATA_PATH)
             
+            # Save object (pipelines)
+            logger.info("Saving preprocessing pipeline and feature selection pipeline...")
+            
+            save_object({"label_encoders": self.label_encoders,
+                        "selected_features": self.selected_feature,
+                        "skewed_columns":self.skewed_columns},
+                        PREPROCESSING_PIPELINE_PATH)     
+                  
             logger.info("Data processing completed successfully")
             
         except Exception as e:
@@ -179,7 +245,7 @@ class DataProcessor:
             raise CustomException("Error occred on data preprocessing pipeline", e)
         
 
-# if __name__ == "__main__":
+if __name__ == "__main__":
     
-#     processor = DataProcessor(TRAIN_FILE_PATH, TEST_FILE_PATH, PROCESSED_DIR, CONFIG_PATH)
-#     processor.pre_process()
+    processor = DataProcessor(TRAIN_FILE_PATH, TEST_FILE_PATH, PROCESSED_DIR, CONFIG_PATH)
+    processor.pre_process()
