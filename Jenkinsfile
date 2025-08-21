@@ -14,7 +14,7 @@ pipeline{
         stage("Build Docker Image"){
             steps{
                 echo 'Building Docker image...'
-                sh 'docker build -t hotel_reserv_app .'
+                sh 'docker build -t hbr_mlops .'
             }
 
         }
