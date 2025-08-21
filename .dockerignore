@@ -1,7 +1,5 @@
-# This ignores all files and directories except what is explicitly allowed.
-# A better approach is to ignore only what is not needed for the build.
 
-# The following are common files and directories to ignore for Python projects
+# The files and directories to ignore for Python projects
 __pycache__
 *.pyc
 .git
