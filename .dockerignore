@@ -1,13 +1,16 @@
-# Ignore everything by default
-*
+# This ignores all files and directories except what is explicitly allowed.
+# A better approach is to ignore only what is not needed for the build.
 
-# Allow files and directories
+# The following are common files and directories to ignore for Python projects
+__pycache__
+*.pyc
+.git
+.gitignore
+.venv
+venv/
+env/
+.env
 
-!app.py
-!requirements.txt
-!src/
-!config/
-!utils/
-!artifacts/
-!Dockerfile
-!*.pkl
+# Logs and other temporary files
+*.log
+tmp/
