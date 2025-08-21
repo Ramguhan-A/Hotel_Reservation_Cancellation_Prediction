@@ -6,6 +6,10 @@ import joblib
 import numpy as np
 import shap
 import matplotlib.pyplot as plt
+import os
+from src.logger import get_logger
+
+logger = get_logger(__name__)
 
 # from src.data_preprocessing import 
 # import sha
@@ -87,11 +91,16 @@ def user_input_features():
 df, submit = user_input_features()
 
 # Print specific input parameters
-st.header("Specified Input Parameter")
+st.header("Specified Input Parameter") 
 st.write(df)
 st.write("---")
-preprocessing_artifacts = joblib.load("artifacts\pipeline\preprocessing_pipeline.pkl")
-loaded_model = joblib.load("artifacts\models\lgbm_model_2.pkl")
+
+# pkl paths
+processing_path = os.path.join("artifacts","pipeline","preprocessing_pipeline.pkl")
+model_path = os.path.join("artifacts","models","lgbm_model_2.pkl")
+
+preprocessing_artifacts = joblib.load(processing_path)
+loaded_model = joblib.load(model_path)
 
 # Applying transformer
 
@@ -100,12 +109,13 @@ selected_features  = preprocessing_artifacts["selected_features"]
 skewed_columns  = preprocessing_artifacts["skewed_columns"]
 
 if submit:
+    
     for col, le in label_encoder.items():
         if col in df.columns:
             df[col] = le.transform(df[col])
             
     for col in skewed_columns:
-        if col in df[col]:
+        if col in df.columns:
             df[col] = np.log1p(df[col])
         
     df = df[selected_features]
@@ -138,4 +148,3 @@ if submit:
     shap.summary_plot(shap_values, df, plot_type="bar", show=False)
     st.pyplot(fig, bbox_inches='tight')
     st.write('---')
-    st.balloons()

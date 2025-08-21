@@ -1,0 +1,13 @@
+# Ignore everything by default
+*
+
+# Allow files and directories
+
+!app.py
+!requirements.txt
+!src/
+!config/
+!utils/
+!artifacts/
+!Dockerfile
+!*.pkl
