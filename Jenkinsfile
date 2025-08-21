@@ -1,28 +1,21 @@
-pipeline{
-    agent {
-        docker {
-            image 'docker:24.0'
-            args '-v /var/run/docker.sock:/var/run/docker.sock'
-        }
-    }
+pipeline {
+    agent any
 
-    stages{
-        stage('Cloning Github repo to Jenkins'){
-            steps{
-                script{
+    stages {
+        stage('Cloning Github repo to Jenkins') {
+            steps {
+                script {
                     echo 'Cloning Github repo to jenkins...'
                     checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[credentialsId: 'github-token', url: 'https://github.com/Ramguhan-A/Hotel_Reservation_Cancellation_Prediction.git']])
                 }
             }
         }
 
-        stage("Build Docker Image"){
-            steps{
+        stage("Build Docker Image") {
+            steps {
                 echo 'Building Docker image...'
                 sh 'docker build -t hbr_mlops .'
             }
-
         }
     }
-
 }
