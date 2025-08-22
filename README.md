@@ -6,7 +6,7 @@ The online hotel reservation channels have dramatically changed booking possibil
 
 Can you predict if the customer is going to honor the reservation or cancel it ?
 
-So to answer this busines problem,
+So to Solve this busines problem,
 * I have Collected and preprocessed hotel booking data
 * Explored multiple machine learning models
 * Evaluated models using F1-score metric to balance precision & recall, since both false positives (predicting cancel when not) and false negatives (predicting not cancel when cancel) are costly.
