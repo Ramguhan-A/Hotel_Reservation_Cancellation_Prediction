@@ -1,5 +1,4 @@
 # This workflow automates the CI/CD pipeline for the application.
-
 name: CI/CD - Deploy to Cloud Run
 
 on:
@@ -12,31 +11,35 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # Step 1: Checkout your repo
+    # Step 1: Checkout repo
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
-    # Step 2: Setup gcloud CLI with service account authentication
+    # Step 2: Authenticate to Google Cloud (using Service Account JSON stored in GitHub Secrets)
     - name: Authenticate to Google Cloud
-      uses: google-github-actions/setup-gcloud@v0
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+    # Step 3: Install gcloud CLI
+    - name: Set up gcloud SDK
+      uses: google-github-actions/setup-gcloud@v2
       with:
         project_id: ${{ secrets.GCP_PROJECT_ID }}
-        service_account_key: ${{ secrets.GCP_SA_KEY }}  # JSON key stored as GitHub Secret
-        export_default_credentials: true
 
-    # Step 3: Build and Push Docker Image to Artifact Registry
+    # Step 4: Build and Push Docker image
     - name: Build and Push Docker image
       env:
         PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-        REGION: us-central1             # Change if needed
-        REPO: my-gcr-repo               # Your Artifact Registry repo
-        IMAGE: my-app-image             # Name of your image
+        REGION: us-central1
+        REPO: my-gcr-repo
+        IMAGE: my-app-image
       run: |
         gcloud auth configure-docker $REGION-docker.pkg.dev -q
         docker build -t $REGION-docker.pkg.dev/$PROJECT_ID/$REPO/$IMAGE:latest .
         docker push $REGION-docker.pkg.dev/$PROJECT_ID/$REPO/$IMAGE:latest
 
-    # Step 4: Deploy to Cloud Run
+    # Step 5: Deploy to Cloud Run
     - name: Deploy to Cloud Run
       env:
         PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
