@@ -60,6 +60,7 @@ Deployment & MLOps:
 
 ## Models Experiments
 <img width="1621" height="654" alt="8d4db3c9-dc4e-4012-a665-96c7f8636b27" src="https://github.com/user-attachments/assets/cfd664b9-fa48-4bd8-9737-0018458bd94a" />
+<img width="940" height="445" alt="image" src="https://github.com/user-attachments/assets/436037a8-e356-4303-a66e-7c8982cf8b60" />
 
 ## Feature importance
 
