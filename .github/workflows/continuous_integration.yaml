@@ -21,7 +21,7 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-      # Step 3: Configure Docker to use gcloud as a credential helper
+      # Step 3: Configure Docker to use gcloud as a credential helper 
       - name: Configure Docker
         run: gcloud auth configure-docker ${{ secrets.GCP_REGION }}-docker.pkg.dev --quiet
 
