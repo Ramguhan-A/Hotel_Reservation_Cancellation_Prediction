@@ -1,68 +1,52 @@
 # This workflow automates the CI/CD pipeline for the application.
-# It builds a Docker image, pushes it to Google Artifact Registry, and deploys it to Cloud Run.
 
-name: CI/CD Pipeline
+name: CI/CD - Deploy to Cloud Run
 
-# Define the events that trigger this workflow.
 on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
-  # Allow the workflow to be triggered manually.
-  workflow_dispatch:
-
-# Define environment variables for the entire workflow.
-env:
-  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-  GCP_REGION: us-central1 # Change to your preferred region
-  SERVICE_NAME: my-cloudrun-service
-  AR_REPOSITORY: my-gcr-repo # The name of your Artifact Registry repository
-  AR_IMAGE_NAME: my-app-image
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: 'read'
-      id-token: 'write' # Required for OIDC authentication
-      packages: 'write' # Required to push to Artifact Registry
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    # Step 1: Checkout your repo
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      # Set up Google Cloud authentication using Workload Identity Federation.
-      - name: 'Authenticate to Google Cloud'
-        uses: 'google-github-actions/auth@v2'
-        with:
-          token_format: 'access_token'
-          workload_identity_provider: 'projects/${{ env.PROJECT_ID }}/locations/global/workloadIdentityPools/github-pool/providers/github'
-          service_account: 'cloud-run-deploy@${{ env.PROJECT_ID }}.iam.gserviceaccount.com'
+    # Step 2: Setup gcloud CLI with service account authentication
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/setup-gcloud@v0
+      with:
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+        service_account_key: ${{ secrets.GCP_SA_KEY }}  # JSON key stored as GitHub Secret
+        export_default_credentials: true
 
-      # Configure Docker to authenticate with Google Artifact Registry.
-      - name: 'Configure Docker to use Artifact Registry'
-        run: 'gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev'
+    # Step 3: Build and Push Docker Image to Artifact Registry
+    - name: Build and Push Docker image
+      env:
+        PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+        REGION: us-central1             # Change if needed
+        REPO: my-gcr-repo               # Your Artifact Registry repo
+        IMAGE: my-app-image             # Name of your image
+      run: |
+        gcloud auth configure-docker $REGION-docker.pkg.dev -q
+        docker build -t $REGION-docker.pkg.dev/$PROJECT_ID/$REPO/$IMAGE:latest .
+        docker push $REGION-docker.pkg.dev/$PROJECT_ID/$REPO/$IMAGE:latest
 
-      # Build the Docker image.
-      - name: 'Build Docker image'
-        run: |
-          # Use a variable to define the full image path for easy access.
-          export AR_IMAGE_PATH="${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.AR_REPOSITORY }}/${{ env.AR_IMAGE_NAME }}:latest"
-          echo "IMAGE_PATH=$AR_IMAGE_PATH" >> $GITHUB_ENV
-          docker build --tag "$AR_IMAGE_PATH" .
-
-      # Push the Docker image to Artifact Registry.
-      - name: 'Push to Artifact Registry'
-        run: docker push ${{ env.IMAGE_PATH }}
-
-      # Deploy the image to Cloud Run.
-      - name: 'Deploy to Cloud Run'
-        uses: 'google-github-actions/deploy-cloudrun@v2'
-        with:
-          service: ${{ env.SERVICE_NAME }}
-          region: ${{ env.GCP_REGION }}
-          image: ${{ env.IMAGE_PATH }}
-          flags: --allow-unauthenticated # or remove this line to require authentication
+    # Step 4: Deploy to Cloud Run
+    - name: Deploy to Cloud Run
+      env:
+        PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+        REGION: us-central1
+        SERVICE_NAME: my-cloudrun-service
+        REPO: my-gcr-repo
+        IMAGE: my-app-image
+      run: |
+        gcloud run deploy $SERVICE_NAME \
+          --image $REGION-docker.pkg.dev/$PROJECT_ID/$REPO/$IMAGE:latest \
+          --region $REGION \
+          --platform managed \
+          --allow-unauthenticated
