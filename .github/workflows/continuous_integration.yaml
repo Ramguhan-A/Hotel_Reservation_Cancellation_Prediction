@@ -1,6 +1,4 @@
-# This workflow automates the CI/CD pipeline for your MLOps project,
-# including deployment to Google Cloud Platform's Cloud Run.
-# This version uses Google Artifact Registry
+# Workflow to automates the CI/CD pipeline 
 
 name: MLOps CI/CD Pipeline to GCP
 
@@ -15,9 +13,9 @@ jobs:
 
     # Define secrets and environment variables for the workflow.
     env:
-      GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}         # Your GCP Project ID
-      GCP_REGION: ${{ secrets.GCP_REGION }}                 # Your GCP Region (e.g., us-central1)
-      AR_REPOSITORY: 'hotel-cancellation-repo'              # Your Artifact Registry Repository name
+      GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}         #  GCP Project ID
+      GCP_REGION: ${{ secrets.GCP_REGION }}                 #  GCP Region (e.g., us-central1)
+      AR_REPOSITORY: 'hotel-cancellation-repo'              #  Artifact Registry Repository name
       AR_IMAGE_NAME: 'hotel-cancellation-app'
       AR_IMAGE_PATH: ${{ env.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.AR_REPOSITORY }}/${{ env.AR_IMAGE_NAME }}:latest
 
