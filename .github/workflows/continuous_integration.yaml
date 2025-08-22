@@ -1,0 +1,76 @@
+# This workflow automates the CI/CD pipeline for your MLOps project,
+# including deployment to Google Cloud Platform's Cloud Run.
+# This version uses Google Artifact Registry
+
+name: MLOps CI/CD Pipeline to GCP
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    # Define secrets and environment variables for the workflow.
+    env:
+      GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}         # Your GCP Project ID
+      GCP_REGION: ${{ secrets.GCP_REGION }}                 # Your GCP Region (e.g., us-central1)
+      AR_REPOSITORY: 'hotel-cancellation-repo'              # Your Artifact Registry Repository name
+      AR_IMAGE_NAME: 'hotel-cancellation-app'
+      AR_IMAGE_PATH: ${{ env.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.AR_REPOSITORY }}/${{ env.AR_IMAGE_NAME }}:latest
+
+    steps:
+      # Step 1: Checkout the repository code
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      # Step 3: Install Python dependencies
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # Step 4: Authenticate with Google Cloud
+      - name: Authenticate to GCP
+        id: 'auth'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
+      # Step 5: Set up Google Cloud SDK and Docker for Artifact Registry
+      - name: Set up Cloud SDK and configure Docker
+        uses: 'google-github-actions/setup-gcloud@v1'
+        with:
+          install-components: 'gke-gcloud-auth-plugin'
+
+      # Step 6: Configure Docker to authenticate with Artifact Registry
+      - name: Configure Docker to use Artifact Registry
+        run: |
+          gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev
+
+      # Step 7: Build Docker image and tag for Artifact Registry
+      - name: Build and tag Docker image
+        run: |
+          docker build . -t ${{ env.AR_IMAGE_PATH }}
+
+      # Step 8: Push the Docker image to Artifact Registry
+      - name: Push Docker image to Artifact Registry
+        run: |
+          docker push ${{ env.AR_IMAGE_PATH }}
+
+      # Step 9: Deploy the image to Cloud Run
+      - name: Deploy to Cloud Run
+        uses: 'google-github-actions/deploy-cloudrun@v1'
+        with:
+          service: 'hotel-cancellation-app'
+          image: ${{ env.AR_IMAGE_PATH }}
+          region: ${{ env.GCP_REGION }}
+          flags: --allow-unauthenticated # This allows public access to the app
