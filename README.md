@@ -58,6 +58,38 @@ Deployment & MLOps:
 ## Workflow i follwed for this project
 <img width="2996" height="2010" alt="Frame 8 (3)" src="https://github.com/user-attachments/assets/97a0a725-c469-4341-8f5d-e7afe9afb706" />
 
+## Dataset Description [Link](https://www.kaggle.com/datasets/ahsan81/hotel-reservations-classification-datasetO)
+
+The dataset contains hotel booking records collected from an online reservation system. Each record represents a booking along with customer details, stay information, and the final booking outcome (canceled or Not canceled).
+
+Key Characteristics:
+
+  * Labeled dataset → outcome for each booking is known.
+  
+  * Mix of categorical & numerical features (e.g., room_type_reserved, market_segment_type vs. lead_time, avg_price_per_room).
+
+  * Dynamic behavior captured (e.g., changing prices, lead time, special requests).
+
+  * Customer history included (repeated_guest, no_of_previous_cancellations, etc.), which is valuable for predictive modeling.
+
+  * Imbalanced classes → cancellations of the reservation is 28.7%
+    
+    <img width="401" height="411" alt="image" src="https://github.com/user-attachments/assets/ebc7c5b9-e062-4621-a8bb-35270eb0be2b" />
+
+## Techinques used
+
+#### Data Balancing
+
+   * Applied Oversampling (SMOTE) to handle the class imbalance in the target variable (booking_status) on the training set.
+
+#### Feature Engineering & Encoding
+
+   * Implemented Label Encoding to convert categorical features (e.g., room_type_reserved, market_segment_type, etc.) into numerical form suitable for machine learning algorithms.
+
+#### Exploratory Data Analysis (EDA)
+
+   * Conducted data visualization (using Matplotlib, Seaborn, SHAP) to uncover patterns and relationships between features such as avg_price_per_room, lead_time, and cancellation likelihood.
+
 ## Models Experiments
 <img width="1621" height="654" alt="8d4db3c9-dc4e-4012-a665-96c7f8636b27" src="https://github.com/user-attachments/assets/cfd664b9-fa48-4bd8-9737-0018458bd94a" />
 <img width="940" height="445" alt="image" src="https://github.com/user-attachments/assets/436037a8-e356-4303-a66e-7c8982cf8b60" />
