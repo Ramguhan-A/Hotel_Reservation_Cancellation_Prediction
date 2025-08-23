@@ -82,6 +82,10 @@ Key Characteristics:
 
    * Applied Oversampling (SMOTE) to handle the class imbalance in the target variable (booking_status) on the training set.
 
+#### Skewness Test
+
+   * Applied log transform on highly skewed collumns
+
 #### Feature Engineering & Encoding
 
    * Implemented Label Encoding to convert categorical features (e.g., room_type_reserved, market_segment_type, etc.) into numerical form suitable for machine learning algorithms.
